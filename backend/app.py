@@ -17,7 +17,7 @@ CORS(
     app,
     resources={r"/*": {"origins": [
         "http://localhost:5173",
-        "https://your-vercel-app.vercel.app"
+        "https://career-copilot-ruby.vercel.app/"
     ]}},
     supports_credentials=True,
     allow_headers=["Content-Type", "Authorization"],
