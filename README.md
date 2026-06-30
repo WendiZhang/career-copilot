@@ -2,20 +2,22 @@
 
 Career Copilot is an AI-powered career assistant that helps job seekers improve their resumes, generate personalized cover letters, and receive AI career guidance.
 
+** Live Demo:** https://career-copilot-ruby.vercel.app/
+
 Built with React, TypeScript, Flask, JWT Authentication, SQLAlchemy, and the OpenAI API.
 
 ---
 
 ## Features
 
-- 🔐 User Registration & Login
-- 🤖 AI Career Chat Assistant
-- 📄 Resume Upload (PDF/DOCX)
-- 📊 AI Resume Analysis
-- ✍️ AI Cover Letter Generator
-- 📈 Personal Dashboard
-- 🔒 JWT Authentication
-- 💾 Resume Analysis History
+- User Registration & Login
+- AI Career Chat Assistant
+- Resume Upload (PDF/DOCX)
+- AI Resume Analysis
+- AI Cover Letter Generator
+- Personal Dashboard
+- JWT Authentication
+- Resume Analysis History
 
 ---
 
@@ -41,29 +43,63 @@ Built with React, TypeScript, Flask, JWT Authentication, SQLAlchemy, and the Ope
 
 ## Screenshots
 
-(Add screenshots here)
+### Dashboard
 
-Dashboard
+![Dashboard](screenshots/dashboard.png)
 
-Resume Analysis
+### Register
 
-AI Chat
+![Dashboard](screenshots/register.png)
 
-Cover Letter
+### Sign in
+
+![Dashboard](screenshots/sign-in.png)
+
+### Resume Analysis
+
+![Resume Analysis](screenshots/resume-analysis.png)
+
+### AI Chat
+
+![AI Chat](screenshots/ai-chat.png)
+
+### Cover Letter
+
+![Cover Letter](screenshots/cover-letter.png)
 
 ---
 
 ## Installation
 
-### Backend
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/WendiZhang/career-copilot.git
+cd career-copilot
+```
+---
+
+### Backend setup
 
 ```bash
 cd backend
 
 python -m venv venv
-
 source venv/bin/activate
 
 pip install -r requirements.txt
 
 python app.py
+```
+
+---
+
+### Frontend setup
+
+```bash
+cd frontend
+
+npm install
+
+npm run dev
+```
