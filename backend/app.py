@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
@@ -13,6 +14,7 @@ from routes.dashboard import dashboard_bp
 load_dotenv()
 
 app = Flask(__name__)
+
 CORS(
     app,
     resources={r"/*": {"origins": [
@@ -29,7 +31,10 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
     "sqlite:///career.db"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# JWT Configuration
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=7)
 
 db.init_app(app)
 JWTManager(app)
@@ -45,7 +50,7 @@ app.register_blueprint(
 
 with app.app_context():
     db.create_all()
-    
+
 @app.route("/")
 def home():
     return {"message": "Career Copilot API is running"}
