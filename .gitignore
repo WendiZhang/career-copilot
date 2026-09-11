@@ -1,8 +1,10 @@
 .env
+.DS_Store
 venv/
 __pycache__/
 *.pyc
 instance/
 career.db
+backend/uploads/
 node_modules/
 dist/

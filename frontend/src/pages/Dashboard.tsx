@@ -3,7 +3,6 @@ import axios from "axios";
 import {
   ArrowRight,
   BarChart3,
-  BriefcaseBusiness,
   CheckCircle2,
   Compass,
   FileSearch,
@@ -17,6 +16,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getApiErrorMessage } from "../services/api";
 
 type DashboardData = {
   resumeScore: number | null;
@@ -61,12 +61,11 @@ export default function Dashboard() {
           }
         );
         setData(response.data);
-      } catch (err: any) {
-        setError(
-          err.response?.data?.message ||
-            err.response?.data?.msg ||
-            "We could not load your latest career insights."
-        );
+      } catch (error: unknown) {
+        setError(getApiErrorMessage(
+          error,
+          "We could not load your latest career insights."
+        ));
       } finally {
         setLoading(false);
       }
@@ -208,7 +207,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ToolCard
               to="/resume-analysis"
               icon={<FileSearch size={22} />}
@@ -230,7 +229,6 @@ export default function Dashboard() {
               description="Ask questions about interviews, applications, and career decisions."
               tone="emerald"
             />
-            <ComingSoonCard />
           </div>
         </section>
 
@@ -375,23 +373,6 @@ function ToolCard({
         Open tool <ArrowRight size={16} />
       </span>
     </Link>
-  );
-}
-
-function ComingSoonCard() {
-  return (
-    <div className="flex min-h-56 flex-col rounded-lg border border-dashed border-slate-300 bg-slate-50 p-5">
-      <div className="w-fit rounded-md border border-slate-200 bg-white p-2.5 text-slate-500">
-        <BriefcaseBusiness size={22} />
-      </div>
-      <h3 className="mt-5 text-lg font-bold text-slate-800">Job Matching</h3>
-      <p className="mt-2 flex-1 text-sm leading-6 text-slate-500">
-        Discover opportunities aligned with your skills and experience.
-      </p>
-      <span className="mt-5 w-fit rounded-md bg-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-600">
-        Coming soon
-      </span>
-    </div>
   );
 }
 

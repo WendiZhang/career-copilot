@@ -43,29 +43,12 @@ def save_resume(file):
 
     return filename, filepath
 
-def get_resume_path(filename=None):
-    if filename:
-        safe_filename = secure_filename(filename)
-        filepath = os.path.join(
-            UPLOAD_FOLDER,
-            safe_filename
-        )
-
-        if os.path.isfile(filepath):
-            return filepath
-
+def get_resume_path(filename):
+    if not filename:
         return None
 
-    files = [
-        os.path.join(UPLOAD_FOLDER, name)
-        for name in os.listdir(UPLOAD_FOLDER)
-        if allowed_file(name)
-    ]
-
-    if not files:
-        return None
-
-    return max(files, key=os.path.getmtime)
+    filepath = os.path.join(UPLOAD_FOLDER, secure_filename(filename))
+    return filepath if os.path.isfile(filepath) else None
 
 def extract_pdf_text(filepath):
     reader = PdfReader(filepath)
@@ -211,14 +194,15 @@ def analyze_resume_text(resume_text):
 
     return normalize_analysis(json.loads(response.output_text))
 
-@upload_routes.route("/api/upload-resume", methods=["POST"])
-def upload_resume():
+@upload_routes.route("/api/analyze-resume", methods=["POST"])
+@jwt_required()
+def analyze_resume():
     if "resume" not in request.files:
         return jsonify({"message": "No file uploaded"}), 400
 
     file = request.files["resume"]
 
-    if file.filename == "":
+    if not file.filename:
         return jsonify({"message": "No file selected"}), 400
 
     if not allowed_file(file.filename):
@@ -226,41 +210,7 @@ def upload_resume():
             "message": "Only PDF and DOCX files are allowed"
         }), 400
 
-    filename, _ = save_resume(file)
-
-    return jsonify({
-        "message": "Resume uploaded successfully",
-        "filename": filename
-    })
-
-@upload_routes.route("/api/analyze-resume", methods=["POST"])
-@jwt_required()
-def analyze_resume():
-    filename = None
-
-    if request.is_json:
-        data = request.get_json() or {}
-        filename = data.get("filename")
-
-    if "resume" in request.files:
-        file = request.files["resume"]
-
-        if file.filename == "":
-            return jsonify({"message": "No file selected"}), 400
-
-        if not allowed_file(file.filename):
-            return jsonify({
-                "message": "Only PDF and DOCX files are allowed"
-            }), 400
-
-        filename, _ = save_resume(file)
-
-    filepath = get_resume_path(filename)
-
-    if not filepath:
-        return jsonify({
-            "message": "Please upload a resume before running analysis."
-        }), 400
+    filename, filepath = save_resume(file)
 
     try:
         resume_text = extract_resume_text(filepath).strip()
@@ -271,11 +221,11 @@ def analyze_resume():
             }), 400
 
         analysis = analyze_resume_text(resume_text)
-        analysis["filename"] = os.path.basename(filepath)
+        analysis["filename"] = filename
         user_id = get_jwt_identity()
         analysis_record = ResumeAnalysis(
             user_id=user_id,
-            filename=os.path.basename(filepath),
+            filename=filename,
             score=analysis["score"],
             strengths=json.dumps(analysis["strengths"]),
             improvements=json.dumps(analysis["improvements"]),

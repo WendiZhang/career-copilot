@@ -3,7 +3,6 @@ from flask_jwt_extended import jwt_required
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
-from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from routes.upload import (
     get_resume_path,

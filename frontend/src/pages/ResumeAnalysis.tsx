@@ -19,6 +19,7 @@ import {
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useState } from "react";
+import { getApiErrorMessage } from "../services/api";
 
 export default function ResumeAnalysis() {
   const [score, setScore] = useState<number | null>(null);
@@ -66,8 +67,8 @@ export default function ResumeAnalysis() {
         return;
       }
 
-      const uploadRes = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/upload-resume`,
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/analyze-resume`,
         formData,
         {
           headers: {
@@ -76,35 +77,18 @@ export default function ResumeAnalysis() {
         }
       );
 
-      localStorage.setItem(
-        "resumeFilename",
-        uploadRes.data.filename
-      );
-
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/analyze-resume`,
-        {
-          filename: uploadRes.data.filename,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setScore(res.data.score);
-      setStrengths(res.data.strengths || []);
-      setImprovements(res.data.improvements || []);
-      setKeywords(res.data.keywords || []);
-      setCareers(res.data.careers || []);
-      setMessage(uploadRes.data.message || "Resume uploaded and analyzed.");
-    } catch (err: any) {
-      setError(
-        err.response?.data?.message ||
-        err.response?.data?.msg ||
-          "We could not upload and analyze your resume. Please try again."
-      );
+      localStorage.setItem("resumeFilename", response.data.filename);
+      setScore(response.data.score);
+      setStrengths(response.data.strengths || []);
+      setImprovements(response.data.improvements || []);
+      setKeywords(response.data.keywords || []);
+      setCareers(response.data.careers || []);
+      setMessage("Resume uploaded and analyzed.");
+    } catch (error: unknown) {
+      setError(getApiErrorMessage(
+        error,
+        "We could not upload and analyze your resume. Please try again."
+      ));
     } finally {
       setLoading(false);
     }
@@ -114,6 +98,11 @@ export default function ResumeAnalysis() {
     if (!hasResults) return;
 
     const doc = new jsPDF();
+    const margin = 20;
+    const textX = 28;
+    const textWidth = doc.internal.pageSize.getWidth() - textX - margin;
+    const bottom = doc.internal.pageSize.getHeight() - margin;
+    const lineHeight = 6;
 
     doc.setFontSize(18);
     doc.text("Resume Analysis Report", 20, 22);
@@ -123,15 +112,36 @@ export default function ResumeAnalysis() {
 
     let y = 52;
 
+    const ensureSpace = (height: number) => {
+      if (y + height > bottom) {
+        doc.addPage();
+        y = margin;
+      }
+    };
+
     const addSection = (title: string, items: string[]) => {
+      // Keep the heading with at least the first line of its content.
+      ensureSpace(10 + lineHeight);
       doc.setFontSize(14);
       doc.text(title, 20, y);
       y += 10;
 
       doc.setFontSize(11);
       items.forEach((item) => {
-        doc.text(`- ${item}`, 24, y);
-        y += 8;
+        const lines = doc.splitTextToSize(item, textWidth) as string[];
+        const itemHeight = lines.length * lineHeight;
+        // Keep normal bullets together; split exceptionally long bullets
+        // line by line so even a single item can span multiple pages.
+        if (itemHeight <= bottom - margin - 10) {
+          ensureSpace(itemHeight);
+        }
+        lines.forEach((line, index) => {
+          ensureSpace(lineHeight);
+          if (index === 0) doc.text("-", 24, y);
+          doc.text(line, textX, y);
+          y += lineHeight;
+        });
+        y += 3;
       });
 
       y += 6;

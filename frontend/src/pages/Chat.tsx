@@ -9,12 +9,11 @@ import {
   Sparkles,
   User,
 } from "lucide-react";
-import { sendChatMessage } from "../services/api";
-
-type Message = {
-  role: "user" | "assistant";
-  content: string;
-};
+import {
+  getApiErrorMessage,
+  sendChatMessage,
+  type ChatMessage,
+} from "../services/api";
 
 const suggestedPrompts = [
   {
@@ -36,7 +35,7 @@ const suggestedPrompts = [
 
 export default function Chat() {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -49,7 +48,7 @@ export default function Chat() {
     const trimmedInput = input.trim();
     if (!trimmedInput || loading) return;
 
-    const userMessage: Message = {
+    const userMessage: ChatMessage = {
       role: "user",
       content: trimmedInput,
     };
@@ -66,11 +65,11 @@ export default function Chat() {
         ...current,
         { role: "assistant", content: reply },
       ]);
-    } catch (err: any) {
-      setError(
-        err.response?.data?.message ||
-          "Career Copilot could not respond. Please try again."
-      );
+    } catch (error: unknown) {
+      setError(getApiErrorMessage(
+        error,
+        "Career Copilot could not respond. Please try again."
+      ));
     } finally {
       setLoading(false);
     }
@@ -207,7 +206,7 @@ export default function Chat() {
   );
 }
 
-function MessageBubble({ message }: { message: Message }) {
+function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
 
   return (

@@ -3,6 +3,7 @@ import axios from "axios";
 import { ArrowRight, Eye, EyeOff, Loader2, LockKeyhole, Mail } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthShell from "../components/AuthShell";
+import { getApiErrorMessage } from "../services/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -26,8 +27,8 @@ export default function Login() {
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("username", response.data.username);
       navigate("/");
-    } catch (err: any) {
-      setMessage(err.response?.data?.message || "Login failed. Please try again.");
+    } catch (error: unknown) {
+      setMessage(getApiErrorMessage(error, "Login failed. Please try again."));
     } finally {
       setLoading(false);
     }

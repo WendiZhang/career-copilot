@@ -32,13 +32,11 @@ export default function AppLayout() {
   return (
     <div className="flex h-[100dvh] bg-gray-100">
 
-      {/* Sidebar */}
       <div
         className={`bg-black text-white p-4 flex flex-col transition-all duration-300
         ${open ? "w-64" : "w-20"}`}
       >
 
-        {/* Top */}
         <div className="flex items-center justify-between mb-6 p-2 px-3">
           {open && (
             <h1 className="text-lg font-bold">
@@ -54,7 +52,6 @@ export default function AppLayout() {
           </button>
         </div>
 
-        {/* Profile */}
         <div className="flex items-center gap-3 mb-6 p-2 px-3 bg-gray-900 rounded-lg">
           <User size={20} />
           {open && (
@@ -69,7 +66,6 @@ export default function AppLayout() {
           )}
         </div>
 
-        {/* Nav */}
         <nav className="space-y-1 flex-1">
 
           <NavLink
@@ -136,7 +132,6 @@ export default function AppLayout() {
 
         </nav>
 
-        {/* Logout */}
         {username && (
           <button
             onClick={handleLogout}
@@ -149,7 +144,6 @@ export default function AppLayout() {
 
       </div>
 
-      {/* Main */}
       <div className="flex-1 p-6 overflow-y-auto">
         <Outlet />
       </div>

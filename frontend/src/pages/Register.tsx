@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthShell from "../components/AuthShell";
+import { getApiErrorMessage } from "../services/api";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -38,10 +39,11 @@ export default function Register() {
       setSuccess(true);
       setMessage(response.data.message || "Account created successfully.");
       window.setTimeout(() => navigate("/login"), 1200);
-    } catch (err: any) {
-      setMessage(
-        err.response?.data?.message || "Registration failed. Please try again."
-      );
+    } catch (error: unknown) {
+      setMessage(getApiErrorMessage(
+        error,
+        "Registration failed. Please try again."
+      ));
     } finally {
       setLoading(false);
     }

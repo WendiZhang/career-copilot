@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import { getApiErrorMessage, isUnauthorized } from "../services/api";
 
 const MIN_JOB_DESCRIPTION_LENGTH = 50;
 
@@ -57,17 +58,16 @@ export default function CoverLetter() {
       );
 
       setCoverLetter(response.data.cover_letter);
-    } catch (err: any) {
-      if (err.response?.status === 401) {
+    } catch (error: unknown) {
+      if (isUnauthorized(error)) {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
       }
 
-      setError(
-        err.response?.data?.message ||
-          err.response?.data?.msg ||
-          "We could not generate your cover letter. Please try again."
-      );
+      setError(getApiErrorMessage(
+        error,
+        "We could not generate your cover letter. Please try again."
+      ));
     } finally {
       setLoading(false);
     }
