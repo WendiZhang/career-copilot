@@ -2,10 +2,6 @@
 
 Career Copilot is an AI-powered career assistant that helps job seekers improve their resumes, generate personalized cover letters, and receive AI career guidance.
 
-Frontend Demo: https://career-copilot-ruby.vercel.app
-
-Backend API: https://career-copilot-v76e.onrender.com
-
 Built with React, TypeScript, Flask, JWT Authentication, SQLAlchemy, and the OpenAI API.
 
 ---
